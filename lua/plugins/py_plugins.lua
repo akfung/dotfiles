@@ -1,0 +1,82 @@
+return {
+  "linux-cultist/venv-selector.nvim",
+  cmd = "VenvSelect",
+  opts = function(_, opts)
+    if require("lazyvim.util").has("nvim-dap-python") then
+      opts.dap_enabled = true
+    end
+    return vim.tbl_deep_extend("force", opts, {
+      name = {
+        "venv",
+        ".venv",
+        "env",
+        ".env",
+        "bin",
+
+      },
+      anaconda_base_path = os.getenv("HOME") .. "/miniconda3",
+      anaconda_envs_path = os.getenv("HOME") .. "/miniconda3/envs",
+      search_workspace = false,
+      search = false,
+      parents = 1,
+      path = "/users/afung/miniconda3",
+      dap_enabled=true
+    })
+  end,
+  keys = { { "<leader>cv", "<cmd>:VenvSelect<cr>", desc = "Select VirtualEnv" } },
+  {
+    "hkupty/iron.nvim",
+    config = function(plugins, opts)
+      local iron = require("iron.core")
+
+      iron.setup({
+        config = {
+          -- Whether a repl should be discarded or not
+          scratch_repl = true,
+          -- Your repl definitions come here
+          repl_definition = {
+            python = {
+              command = function()
+                local ipythonAvailable = vim.fn.executable("ipython") == 1
+                local binary = ipythonAvailable  and "ipython" or "python3"
+                return { binary }
+              end,
+            format = require("iron.fts.common").bracketed_paste,
+            },
+          },
+          -- How the repl window will be displayed
+          -- See below for more information
+          repl_open_cmd = require("iron.view").right(80),
+        },
+        -- Iron doesn't set keymaps by default anymore.
+        -- You can set them here or manually add keymaps to the functions in iron.core
+        keymaps = {
+          send_motion = "<space>rc",
+          visual_send = "<space>rc",
+          send_file = "<space>rf",
+          send_line = "<space>rl",
+          send_mark = "<space>rm",
+          mark_motion = "<space>rmc",
+          mark_visual = "<space>rmc",
+          remove_mark = "<space>rmd",
+          cr = "<space>r<cr>",
+          interrupt = "<space>r<space>",
+          exit = "<space>rq",
+          clear = "<space>rx",
+        },
+        -- If the highlight is on, you can change how it looks
+        -- For the available options, check nvim_set_hl
+        highlight = {
+          italic = true,
+        },
+        ignore_blank_lines = true, -- ignore blank lines when sending visual select lines
+      })
+
+      -- iron also has a list of commands, see :h iron-commands for all available commands
+      vim.keymap.set("n", "<space>rs", "<cmd>IronRepl<cr>")
+      vim.keymap.set("n", "<space>rr", "<cmd>IronRestart<cr>")
+      vim.keymap.set("n", "<space>rF", "<cmd>IronFocus<cr>")
+      vim.keymap.set("n", "<space>rh", "<cmd>IronHide<cr>")
+    end,
+  }
+}
