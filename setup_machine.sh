@@ -234,6 +234,7 @@ bind-key -r L resize-pane -R 5
 bind-key c new-window -c "#{pane_current_path}"
 bind-key n next-window
 bind-key p previous-window
+bind-key u copy-mode
 
 # Mouse support
 set -g mouse on
